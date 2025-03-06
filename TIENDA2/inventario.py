@@ -1,5 +1,5 @@
+# Código para el inventario Tienda2
 class Producto:
-    # Código inventario Tienda2
     """
     Clase que representa un producto en la tienda.
     """
@@ -13,8 +13,8 @@ class Producto:
         :param clasificacion: Clasificación o categoría del producto.
         """
         self.nombre = nombre
-        self.precio = precio
-        self.cantidad = cantidad
+        self.precio = float(precio)  # Asegurar que el precio sea flotante
+        self.cantidad = int(cantidad)  # Asegurar que la cantidad sea entera
         self.descripcion = descripcion
         self.clasificacion = clasificacion
     
@@ -23,7 +23,7 @@ class Producto:
         return self.precio * self.cantidad
 
 def obtener_productos():
-    """Permite al usuario ingresar productos manualmente."""
+    """Genera una lista de productos sin usar input(), útil para GitHub Code."""
     productos = [
         Producto("SALCHICHA RANCHERA", 4500, 10, "SALCHICHA RANCHERA x3 marca RANCHERA", "alimentación"),
         Producto("Queso Mozzarella", 9400, 8, "QUESO MOZZARELLA TAJADO x400 GRS marca LATTI", "alimentación"),
@@ -31,30 +31,32 @@ def obtener_productos():
         Producto("Yogurt Melocotón", 3000, 14, "Yogurt Alpina Melocotón x150 GRS", "alimentación"),
         Producto("Leche Deslactosada", 34000, 14, "Leche Colanta Deslactosada Semidescremada 1000 Ml X6 Unds", "alimentación")
     ]
+    return productos
 
+def ingresar_productos():
+    """Permite al usuario ingresar productos manualmente."""
+    productos = obtener_productos()
     cantidad_productos = int(input("¿Cuántos productos adicionales va a ingresar? "))
-
-    for i in range(cantidad_productos):
-        print(f"\nProducto {i+1}, ¿cuál es el nombre?")
-        nombre = input("> ").strip()
-        precio = float(input(f"¿Cuál es el precio de '{nombre}'? > ").strip())
-        cantidad = int(input(f"¿Qué cantidad hay de '{nombre}'? > ").strip())
-        descripcion = input(f"Introduzca la descripción de '{nombre}': > ").strip()
-        clasificacion = input(f"¿Qué clasificación tiene '{nombre}'? > ").strip()
-
+    
+    for i in range(1, cantidad_productos + 1):
+        print(f"\nProducto {i}, ¿cuál es el nombre?")
+        nombre = input("> ")
+        precio = float(input(f"¿Cuál es el precio de '{nombre}'? > "))
+        cantidad = int(input(f"¿Qué cantidad hay de '{nombre}'? > "))
+        descripcion = input(f"Introduzca la descripción de '{nombre}': > ")
+        clasificacion = input(f"¿Qué clasificación tiene '{nombre}'? > ")
         productos.append(Producto(nombre, precio, cantidad, descripcion, clasificacion))
     
     return productos
 
 def mostrar_resumen(productos):
-    """Muestra el resumen de los productos ingresados con formato correcto."""
+    """Muestra el resumen de los productos ingresados."""
     print("\nResumen:")
     print(f"{'Producto':<20}{'Cantidad':<10}{'Precio':<10}{'Descripción':<30}{'Clasificación':<15}")
-    print("="*90)
+    print("=" * 90)
     
     for producto in productos:
-        descripcion_corta = (producto.descripcion[:27] + "...") if len(producto.descripcion) > 30 else producto.descripcion
-        print(f"{producto.nombre:<20}{producto.cantidad:<10}{producto.precio:<10.2f}{descripcion_corta:<30}{producto.clasificacion:<15}")
+        print(f"{producto.nombre:<20}{producto.cantidad:<10}{producto.precio:<10.2f}{producto.descripcion[:27]:<30}{producto.clasificacion:<15}")
     
     calcular_precio_por_clasificacion(productos)
 
@@ -63,20 +65,21 @@ def calcular_precio_por_clasificacion(productos):
     precios_por_clasificacion = {}
     
     for producto in productos:
+        precio_total_producto = producto.calcular_precio_total()
+        
         if producto.clasificacion in precios_por_clasificacion:
-            precios_por_clasificacion[producto.clasificacion] += producto.calcular_precio_total()
+            precios_por_clasificacion[producto.clasificacion] += precio_total_producto
         else:
-            precios_por_clasificacion[producto.clasificacion] = producto.calcular_precio_total()
+            precios_por_clasificacion[producto.clasificacion] = precio_total_producto
     
     print("\nPrecios por clasificación:")
     print(f"{'Clasificación':<20}{'Precio Total':<15}")
-    print("="*40)
+    print("=" * 35)
     
     for clasificacion, precio_total in precios_por_clasificacion.items():
         print(f"{clasificacion:<20}{precio_total:<15.2f}")
 
 if __name__ == "__main__":
-    productos = obtener_productos()
+    productos = ingresar_productos()
     mostrar_resumen(productos)
-
 
