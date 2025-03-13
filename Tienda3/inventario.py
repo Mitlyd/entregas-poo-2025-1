@@ -1,3 +1,5 @@
+from tabulate import tabulate
+
 class Producto:
     """
     Clase que representa un producto en la tienda.
@@ -5,15 +7,10 @@ class Producto:
     def __init__(self, nombre, precio, cantidad, descripcion, clasificacion):
         """
         Inicializa un producto con los atributos dados.
-        :param nombre: Nombre del producto.
-        :param precio: Precio unitario del producto.
-        :param cantidad: Cantidad disponible del producto.
-        :param descripcion: Descripción detallada del producto.
-        :param clasificacion: Clasificación o categoría del producto.
         """
         self.nombre = nombre
-        self.precio = float(precio)  
-        self.cantidad = int(cantidad)  
+        self.precio = float(precio)
+        self.cantidad = int(cantidad)
         self.descripcion = descripcion
         self.clasificacion = clasificacion
 
@@ -55,39 +52,47 @@ def ingresar_productos():
 
 
 def mostrar_resumen(productos):
-    """Muestra el resumen de los productos ingresados."""
-    print("\nResumen:")
-    print(f"{'Producto':<15}{'Cantidad':<10}{'Precio':<10}{'Descripción':<25}{'Clasificación':<15}{'Total Inv.':<15}{'Precio x5'}")
-    print("=" * 100)
-
+    """Muestra el resumen de los productos ingresados en formato de tabla."""
+    
+    tabla_productos = []
+    
     for producto in productos:
-        total_inv = producto.inventario_precio()
-        precio_5_unidades = producto.calcula_precio(5)
-        print(f"{producto.nombre:<15}{producto.cantidad:<10}{producto.precio:<10.2f}{producto.descripcion[:22]:<25}{producto.clasificacion:<15}{total_inv:<15.2f}{precio_5_unidades:<10.2f}")
+        tabla_productos.append([
+            producto.nombre, 
+            f"{producto.cantidad} unidades",
+            f"{producto.precio:,.2f} pesos",
+            producto.descripcion[:22] + "..." if len(producto.descripcion) > 22 else producto.descripcion,
+            producto.clasificacion,
+            f"{producto.inventario_precio():,.2f} pesos",
+            f"{producto.calcula_precio(5):,.2f} pesos"
+        ])
+
+    headers = ["Producto", "Cantidad", "Precio", "Descripción", "Clasificación", "Total en inventario", "Precio x5 unidades"]
+
+    print("\n Resumen de Productos:\n")
+    print(tabulate(tabla_productos, headers=headers, tablefmt="fancy_grid"))
 
     calcular_precio_por_clasificacion(productos)
 
 
 def calcular_precio_por_clasificacion(productos):
-    """Calcula y muestra el precio total por clasificación."""
+    """Calcula y muestra el precio total por clasificación en una tabla organizada."""
     precios_por_clasificacion = {}
 
     for producto in productos:
         precio_total_producto = producto.inventario_precio()
-
         if producto.clasificacion in precios_por_clasificacion:
             precios_por_clasificacion[producto.clasificacion] += precio_total_producto
         else:
             precios_por_clasificacion[producto.clasificacion] = precio_total_producto
 
-    print("\nPrecios por clasificación:")
-    print(f"{'Clasificación':<20}{'Precio Total':<15}")
-    print("=" * 40)
+    tabla_clasificacion = [[clasificacion, f"{precio_total:,.2f} pesos"] for clasificacion, precio_total in precios_por_clasificacion.items()]
 
-    for clasificacion, precio_total in precios_por_clasificacion.items():
-        print(f"{clasificacion:<20}{precio_total:<15.2f}")
+    print("\n Precios por Clasificación:\n")
+    print(tabulate(tabla_clasificacion, headers=["Clasificación", "Precio Total"], tablefmt="fancy_grid"))
 
 
 if __name__ == "__main__":
     productos = ingresar_productos()
     mostrar_resumen(productos)
+
